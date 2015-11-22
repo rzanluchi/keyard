@@ -1,2 +1,3 @@
 etcd==2.0.8
 falcon==0.3.0
+gunicorn==19.3.0
