@@ -6,6 +6,8 @@ echo Installing EPEL packages...
 yum install -y nss --disablerepo=epel
 curl -L  https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -o etcd-v2.2.2-linux-amd64.tar.gz
 tar xzvf etcd-v2.2.2-linux-amd64.tar.gz
+yum install -y python-pip
+pip install virtualenv
 
 SCRIPT
 
