@@ -1,5 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+$script = <<SCRIPT
+echo I am provisioning...
+echo Installing EPEL packages...
+yum install -y nss --disablerepo=epel
+curl -L  https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -o etcd-v2.2.2-linux-amd64.tar.gz
+tar xzvf etcd-v2.2.2-linux-amd64.tar.gz
+
+SCRIPT
+
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
@@ -119,4 +128,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
+  config.vm.provision "shell", inline: $script
 end
