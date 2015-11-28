@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-from store import store
 
 
-def register(serivce_name, location):
-    pass
+class StoreCommands(object):
+    """Commands class to interact with the store.
+    """
+    def __init__(self, store):
+        self.store = store
 
+    def register(self, service_name, location):
+        self.store.append_to_key(service_name, location)
 
-def unregister(service_name, location):
-    pass
+    def unregister(self, service_name, location):
+        self.store.delete_key(service_name)
 
-
-def health_check(service_name, location):
-    pass
+    def health_check(self, service_name, location):
+        self.store.set_key(service_name, location)

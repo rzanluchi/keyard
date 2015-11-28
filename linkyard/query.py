@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
-from store import store
 
 
-def get_service_locations(service_name):
-    pass
+class StoreQuery(object):
+    """Query class to interact with the store.
+    """
+    def __init__(self, store):
+        self.store = store
+
+    def get_service_locations(self, service_name):
+        return self.store.get_key(service_name)

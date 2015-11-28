@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import commands
 import query
+from store import store_factory
+
 
 class API(object):
     """This class represent all methods that can be exposed for other services
@@ -8,6 +10,10 @@ class API(object):
 
     This class will be a gateway for command/query methods
     """
+    def __init__(self, store_mode="simple", **kwargs):
+        self.store = store_factory(store_mode)(**kwargs)
+        self.commands = commands.StoreCommands(self.store)
+        self.query = query.StoreQuery(self.store)
 
     def register(self, service_name, location):
         """Endpoint to register a ative service
@@ -17,7 +23,7 @@ class API(object):
         Returns:
             return a boolean with status of the operation in etcd
         """
-        return commands.register(service_name, location)
+        return self.commands.register(service_name, location)
 
     def unregister(self, service_name, location):
         """Endpoint to unregister a ative service
@@ -27,7 +33,7 @@ class API(object):
         Returns:
             return a boolean with status of the operation in etcd
         """
-        return commands.unregister(service_name, location)
+        return self.ommands.unregister(service_name, location)
 
     def health_check(self, service_name, location):
         """Endpoint to renew the tll of a service in a location
@@ -37,7 +43,7 @@ class API(object):
         Returns:
             return a boolean with status of the operation in etcd
         """
-        return commands.health_check(service_name, locations)
+        return self.commands.health_check(service_name, location)
 
     def get_service_locations(self, service_name):
         """Endpoint to list all available locations by service name
@@ -46,4 +52,4 @@ class API(object):
         Returns
             returns a list with all avaiable locations for that service
         """
-        return query.get_service_locations(services_name)
+        return self.query.get_service_locations(service_name)
