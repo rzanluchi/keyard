@@ -5,7 +5,6 @@ import mock
 from linkyard import store
 
 
-
 class TestEtcdStore(object):
 
     @mock.patch('linkyard.store.EtcdStore.connect')
@@ -20,38 +19,26 @@ class TestEtcdStore(object):
     def test_get_key(self):
         magic_mock = mock.MagicMock()
         magic_mock_node = mock.NonCallableMock(
-            **{'node.value': 'localhost:7088'})
-        magic_mock.node.get.return_value = magic_mock_node
+            **{'value': 'localhost:7088'})
+        magic_mock.get.return_value = magic_mock_node
         self.store.connection = magic_mock
         assert self.store.get_key('registry') == 'localhost:7088'
-        self.store.connection.node.get.assert_called_with('registry')
+        self.store.connection.get.assert_called_with('/services/registry')
 
     def test_set_key(self):
         magic_mock = mock.MagicMock()
-        magic_mock.node.set.return_value = True
+        magic_mock.set.return_value = True
         self.store.connection = magic_mock
-        assert self.store.set_key('registry', 'localhost:2747') == True
-        self.store.connection.node.set.assert_called_with(
-            'registry', 'localhost:2747', ttl=None)
+        assert self.store.set_key('registry', 'localhost:2747') is True
+        self.store.connection.set.assert_called_with(
+            '/services/registry', 'localhost:2747', ttl=None)
 
     def test_delete_key(self):
         magic_mock = mock.MagicMock()
-        magic_mock.node.delete.return_value = True
+        magic_mock.delete.return_value = True
         self.store.connection = magic_mock
-        assert self.store.delete_key('registry') == True
-        self.store.connection.node.delete.assert_called_with('registry')
-
-    def test_append_to_key(self):
-        magic_mock = mock.MagicMock()
-        magic_mock.node.set.return_value = True
-        magic_mock_node = mock.NonCallableMock(
-            **{'node.value': 'localhost:7088'})
-        magic_mock.node.get.return_value = magic_mock_node
-        self.store.connection = magic_mock
-        assert self.store.append_to_key('registry', '127.0.0.1:8088') == True
-        self.store.connection.node.get.assert_called_with('registry')
-        self.store.connection.node.set.assert_called_with('registry',
-            ['localhost:7088', '127.0.0.1:8088'], ttl=None)
+        assert self.store.delete_key('registry') is True
+        self.store.connection.delete.assert_called_with('/services/registry')
 
 
 class TestMemoryStore(object):
@@ -72,10 +59,3 @@ class TestMemoryStore(object):
         local_store.store['registry'] = 'localhost:8888'
         local_store.delete_key('registry')
         assert local_store.store == {}
-
-    def test_append_to_key(self):
-        local_store = store.MemoryStore()
-        local_store.store['registry'] = 'localhost:8888'
-        local_store.append_to_key('registry', 'localhost:57')
-        assert local_store.store['registry'] == \
-            ['localhost:8888', 'localhost:57']

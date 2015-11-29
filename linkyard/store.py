@@ -5,29 +5,34 @@ from etcd.client import Client
 class EtcdStore(object):
     """Adapter class for etcd api
     """
-    def __init__(self, etcd_location=""):
-        self.connect(etcd_location)
 
-    def connect(self, etcd_location):
-        self.connection = Client(etcd_location)
+    def __init__(self, etcd_location="127.0.0.1", base_path="/services",
+                 **kwargs):
+        self.connect(etcd_location, **kwargs)
+        self.base_path = base_path
+
+    def connect(self, etcd_location, **kwargs):
+        self.connection = Client(host=etcd_location, **kwargs)
 
     def get_key(self, key):
-        item = self.connection.node.get(key)
-        return item.node.value
+        item = self.connection.get(self._build_path(key))
+        return item.value
 
     def set_key(self, key, value, ttl=None):
-        return self.connection.node.set(key, value, ttl=ttl)
+        return self.connection.set(self._build_path(key), value, ttl=ttl)
 
     def delete_key(self, key):
-        return self.connection.node.delete(key)
+        return self.connection.delete(self._build_path(key))
 
-    def append_to_key(self, key, value, ttl=None):
-        item_value = self.get_key(key)
-        if type(item_value) == list:
-            item_value.append(item_value)
-        else:
-            item_value = [item_value, value]
-        return self.set_key(key, item_value)
+    def get_services_keys(self, key):
+        nodes = self.connection.read(key, recursive=True)
+        return [self._extract_key(node.key) for node in nodes.children]
+
+    def _build_path(self, path):
+        return "{0}/{1}".format(self.base_path, path)
+
+    def _extract_key(self, path):
+        return path.split("{0}/".format(self.base_path)).pop()
 
 
 class MemoryStore(object):
@@ -46,13 +51,8 @@ class MemoryStore(object):
     def delete_key(self, key):
         del self.store[key]
 
-    def append_to_key(self, key, value, **kwargs):
-        item_value = self.get_key(key)
-        if type(item_value) == list:
-            item_value.append(value)
-        else:
-            item_value = [item_value, value]
-        return self.set_key(key, item_value)
+    def get_services_keys(self):
+        return self.store.keys()
 
 
 def store_factory(mode="simple"):
