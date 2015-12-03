@@ -4,55 +4,108 @@ from etcd.client import Client
 
 class EtcdStore(object):
     """Adapter class for etcd api
+
+    We will store the services in folders at etcd separated by service_name
+    version and locaion
+    /services/{service_name}/{version}/{location} = {location}
+    So that way we can list all different locations for the same service and
+    utilize the etcd ttl to expire keys.
+
+    Versions, if not provided, will be 1.0 by default when setting values
     """
 
     def __init__(self, etcd_location="127.0.0.1", base_path="/services",
                  **kwargs):
-        self.connect(etcd_location, **kwargs)
+        self._connect(etcd_location, **kwargs)
         self.base_path = base_path
 
-    def connect(self, etcd_location, **kwargs):
+    def _connect(self, etcd_location, **kwargs):
         self.connection = Client(host=etcd_location, **kwargs)
 
-    def get_key(self, key):
-        item = self.connection.get(self._build_path(key))
+    def get_key(self, service_name, version, location):
+        key = self._build_path(service_name, version, location)
+        item = self.connection.get(key)
         return item.value
 
-    def set_key(self, key, value, ttl=None):
-        return self.connection.set(self._build_path(key), value, ttl=ttl)
+    def set_key(self, service_name, version, location, ttl=None):
+        assert location
+        if not version:
+            version = '1.0'
+        key = self._build_path(service_name, version, location)
+        return self.connection.set(key, location, ttl=ttl)
 
-    def delete_key(self, key):
-        return self.connection.delete(self._build_path(key))
+    def delete_key(self, service_name, version, location):
+        "version and location cannot be None"
+        assert version
+        assert location
+        key = self._build_path(service_name, version, location)
+        return self.connection.delete(key)
 
     def get_services_keys(self, key):
         nodes = self.connection.read(key, recursive=True)
         return [self._extract_key(node.key) for node in nodes.children]
 
-    def _build_path(self, path):
-        return "{0}/{1}".format(self.base_path, path)
+    def _build_path(self, service_name, version, location):
+        "Builds the query path for the value in the etcd"
+        assert service_name  # service_name is the minimum requirement
+        key = "{0}/{1}".format(self.base_path, service_name)
+        if version:
+            key = "{0}/{1}".format(key, version)
+            if location:
+                key = "{0}/{1}".format(key, location)
+
+        return key
 
     def _extract_key(self, path):
+        "Removes Base Path of the key"
         return path.split("{0}/".format(self.base_path)).pop()
 
 
 class MemoryStore(object):
     """Adapter class for in memory store
+
+    Will Store keys composing service_name, version and location to allow
+    multiple locations to the same service.
     """
     def __init__(self, **kwargs):
         self.store = {}
 
-    def get_key(self, key):
-        return self.store.get(key)
+    def get_key(self, service_name, version, location):
+        keys = self.get_services_keys(service_name, version, location)
+        return [self.store[key] for key in keys]
 
-    def set_key(self, key, value, **kwargs):
-        self.store[key] = value
+    def set_key(self, service_name, version, location, **kwargs):
+        """Accepts **kwargs to be compatible with etcd store that accepts
+        ttl parameter"""
+        assert location
+        if not version:
+            version = '1.0'
+        key = self._build_path(service_name, version, location)
+        self.store[key] = location
         return True
 
-    def delete_key(self, key):
+    def delete_key(self, service_name, version, location):
+        "version and location cannot be None"
+        assert version
+        assert location
+        key = self._build_path(service_name, version, location)
         del self.store[key]
 
-    def get_services_keys(self):
-        return self.store.keys()
+    def get_services_keys(self, service_name, version, location):
+        "not sure if I will use it now"
+        key = self._build_path(service_name, version, location)
+        return filter(lambda k: k.startswith(key), self.store.keys())
+
+    def _build_path(self, service_name, version, location):
+        "Builds the key to use at store"
+        assert service_name  # service_name is the minimum requirement
+        key = service_name
+        if version:
+            key = "{0}/{1}".format(key, version)
+            if location:
+                key = "{0}/{1}".format(key, location)
+
+        return key
 
 
 def store_factory(mode="simple"):
