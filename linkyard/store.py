@@ -89,7 +89,10 @@ class MemoryStore(object):
         assert version
         assert location
         key = self._build_path(service_name, version, location)
-        del self.store[key]
+        if key in self.store:
+            del self.store[key]
+            return True
+        return False
 
     def get_services_keys(self, service_name, version, location):
         "not sure if I will use it now"
