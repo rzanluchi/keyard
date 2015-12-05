@@ -7,5 +7,5 @@ class StoreQuery(object):
     def __init__(self, store):
         self.store = store
 
-    def get_service_locations(self, service_name, version=None, location=None):
+    def get_service(self, service_name, version=None, location=None):
         return self.store.get_key(service_name, version, location)
