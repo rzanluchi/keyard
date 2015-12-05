@@ -7,11 +7,11 @@ class StoreCommands(object):
     def __init__(self, store):
         self.store = store
 
-    def register(self, service_name, location):
-        self.store.append_to_key(service_name, location)
+    def register(self, service_name, version, location):
+        self.store.set_key(service_name, version, location)
 
-    def unregister(self, service_name, location):
-        self.store.delete_key(service_name)
+    def unregister(self, service_name, version, location):
+        self.store.delete_key(service_name, version, location)
 
-    def health_check(self, service_name, location):
-        self.store.set_key(service_name, location)
+    def health_check(self, service_name, version, location):
+        self.store.set_key(service_name, version, location)
