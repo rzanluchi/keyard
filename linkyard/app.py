@@ -13,8 +13,10 @@ class LinkyardResource(object):
     def on_get(self, req, resp):
         service_name = req.get_param('service_name')
         version = req.get_param('version')
+        load_balancer_strategy = req.get_param('load_balancer_strategy')
         try:
-            result = self.api.get_service(service_name, version)
+            result = self.api.get_service(service_name, version,
+                                          load_balancer_strategy)
             resp.status = falcon.HTTP_200
             resp.data = json.dumps({'result': result})
         except Exception as e:

@@ -2,116 +2,107 @@
 import falcon
 import falcon.testing
 import json
-import mock
 
 from linkyard import app
 
 
-class TestLinkyardResource(falcon.testing.TestBase):
+class TestIntegrationLinkyardResource(falcon.testing.TestBase):
 
     def before(self):
         self.resource = app.LinkyardResource()
-        self.resource.api = mock.MagicMock()
         self.api.add_route('/linkyard', self.resource)
 
+    def tearDown(self):
+        self.resource.api.store.store = {}
+
     def test_get(self):
-        self.resource.api.get_service.return_value = ["localhost:8080"]
+        self.resource.api.register('web', '1.0', 'localhost:8080')
         body = self.simulate_request('linkyard',
                                      query_string="service_name=web")
         parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
         self.assertEqual(parsed_body.get('result'), ['localhost:8080'])
-        self.resource.api.get_service.assert_called_with('web', None, None)
 
     def test_get_with_version(self):
-        self.resource.api.get_service.return_value = ["localhost:8080"]
+        self.resource.api.register('web', '1.0', 'localhost:9090')
         body = self.simulate_request(
             'linkyard', query_string="service_name=web&version=1.0")
         parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
-        self.assertEqual(parsed_body.get('result'), ['localhost:8080'])
-        self.resource.api.get_service.assert_called_with('web', '1.0', None)
+        self.assertEqual(parsed_body.get('result'), ['localhost:9090'])
 
     def test_get_with_load_balancer(self):
-        self.resource.api.get_service.return_value = "localhost:8080"
+        self.resource.api.register('web', '1.0', 'localhost:9090')
         body = self.simulate_request(
             'linkyard',
             query_string="service_name=web&load_balancer_strategy=random")
         parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
-        self.assertEqual(parsed_body.get('result'), 'localhost:8080')
-        self.resource.api.get_service.assert_called_with('web', None, 'random')
+        self.assertEqual(parsed_body.get('result'), 'localhost:9090')
 
     def test_bad_get(self):
-        self.resource.api.get_service.return_value = "localhost:8080"
-        self.resource.api.get_service.side_effect = AssertionError
         body = self.simulate_request('linkyard')
+        parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_500, body)
-        self.resource.api.get_service.assert_called_with(None, None, None)
+        self.assertTrue('error' in parsed_body, parsed_body)
 
     def test_post(self):
-        self.resource.api.register.return_value = True
         self.simulate_request(
             'linkyard', method="POST",
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8888'}))
 
         self.assertEqual(self.srmock.status, falcon.HTTP_201)
-        self.resource.api.register.assert_called_with('web', '1.0',
-                                                      'localhost:8888')
+        self.assertEqual(self.resource.api.get_service('web'),
+                         ['localhost:8888'])
 
     def test_bad_post(self):
-        self.resource.api.register.return_value = True
-        self.resource.api.register.side_effect = AssertionError
-        self.simulate_request(
+        body = self.simulate_request(
             'linkyard', method="POST",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
+        parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_500)
-        self.resource.api.register.assert_called_with('web', '1.0', None)
+        self.assertTrue('error' in parsed_body, parsed_body)
 
     def test_put(self):
-        self.resource.api.health_check.return_value = True
         self.simulate_request(
             'linkyard', method="PUT",
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8888'}))
 
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
-        self.resource.api.health_check.assert_called_with('web', '1.0',
-                                                          'localhost:8888')
+        self.assertEqual(self.resource.api.get_service('web'),
+                         ['localhost:8888'])
 
     def test_bad_put(self):
-        self.resource.api.health_check.return_value = True
-        self.resource.api.health_check.side_effect = AssertionError
-        self.simulate_request(
+        body = self.simulate_request(
             'linkyard', method="PUT",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
+        parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_500)
-        self.resource.api.health_check.assert_called_with('web', '1.0', None)
+        self.assertTrue('error' in parsed_body, parsed_body)
 
     def test_delete(self):
-        self.resource.api.unregister.return_value = True
+        self.resource.api.register('web', '1.0', 'localhost:8080')
         self.simulate_request(
             'linkyard', method="DELETE",
             body=json.dumps({'service_name': 'web', 'version': '1.0',
-                             'location': 'localhost:8888'}))
+                             'location': 'localhost:8080'}))
 
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
-        self.resource.api.unregister.assert_called_with('web', '1.0',
-                                                        'localhost:8888')
+        self.assertEqual(self.resource.api.store.store, {})
 
     def test_bad_delete(self):
-        self.resource.api.unregister.return_value = True
-        self.resource.api.unregister.side_effect = AssertionError
-        self.simulate_request(
+        body = self.simulate_request(
             'linkyard', method="DELETE",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
+        parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_500)
-        self.resource.api.unregister.assert_called_with('web', '1.0', None)
+        self.assertTrue('error' in parsed_body, parsed_body)
