@@ -34,17 +34,17 @@ class TestLinkyardResource(falcon.testing.TestBase):
         self.assertEqual(parsed_body.get('result'), 'localhost:8080')
         self.resource.api.get_service.assert_called_with('web', '1.0')
 
-    def test_wrong_get(self):
+    def test_bad_get(self):
         self.resource.api.get_service.return_value = "localhost:8080"
+        self.resource.api.get_service.side_effect = AssertionError
         body = self.simulate_request('linkyard')
-        parsed_body = json.loads(body[0])
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500)
+        self.assertEqual(self.srmock.status, falcon.HTTP_500, body)
         self.resource.api.get_service.assert_called_with(None, None)
 
     def test_post(self):
         self.resource.api.register.return_value = True
-        body = self.simulate_request(
+        self.simulate_request(
             'linkyard', method="POST",
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8888'}))
@@ -53,3 +53,54 @@ class TestLinkyardResource(falcon.testing.TestBase):
         self.resource.api.register.assert_called_with('web', '1.0',
                                                       'localhost:8888')
 
+    def test_bad_post(self):
+        self.resource.api.register.return_value = True
+        self.resource.api.register.side_effect = AssertionError
+        self.simulate_request(
+            'linkyard', method="POST",
+            body=json.dumps({'service_name': 'web', 'version': '1.0'}))
+
+        self.assertEqual(self.srmock.status, falcon.HTTP_500)
+        self.resource.api.register.assert_called_with('web', '1.0', None)
+
+    def test_put(self):
+        self.resource.api.health_check.return_value = True
+        self.simulate_request(
+            'linkyard', method="PUT",
+            body=json.dumps({'service_name': 'web', 'version': '1.0',
+                             'location': 'localhost:8888'}))
+
+        self.assertEqual(self.srmock.status, falcon.HTTP_200)
+        self.resource.api.health_check.assert_called_with('web', '1.0',
+                                                          'localhost:8888')
+
+    def test_bad_put(self):
+        self.resource.api.health_check.return_value = True
+        self.resource.api.health_check.side_effect = AssertionError
+        self.simulate_request(
+            'linkyard', method="PUT",
+            body=json.dumps({'service_name': 'web', 'version': '1.0'}))
+
+        self.assertEqual(self.srmock.status, falcon.HTTP_500)
+        self.resource.api.health_check.assert_called_with('web', '1.0', None)
+
+    def test_delete(self):
+        self.resource.api.unregister.return_value = True
+        self.simulate_request(
+            'linkyard', method="DELETE",
+            body=json.dumps({'service_name': 'web', 'version': '1.0',
+                             'location': 'localhost:8888'}))
+
+        self.assertEqual(self.srmock.status, falcon.HTTP_200)
+        self.resource.api.unregister.assert_called_with('web', '1.0',
+                                                        'localhost:8888')
+
+    def test_bad_delete(self):
+        self.resource.api.unregister.return_value = True
+        self.resource.api.unregister.side_effect = AssertionError
+        self.simulate_request(
+            'linkyard', method="DELETE",
+            body=json.dumps({'service_name': 'web', 'version': '1.0'}))
+
+        self.assertEqual(self.srmock.status, falcon.HTTP_500)
+        self.resource.api.unregister.assert_called_with('web', '1.0', None)
