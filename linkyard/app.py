@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import falcon
+import json
 
 from linkyard import api
 
@@ -15,7 +16,7 @@ class LinkyardResource(object):
         result = self.api.get_service(service_name, version)
 
         resp.status = falcon.HTTP_200
-        resp.body = {'result': result}
+        resp.data = json.dumps({'result': result})
 
     def on_post(self, req, resp):
         service_name = req.context['service_name']
@@ -27,7 +28,7 @@ class LinkyardResource(object):
             resp.status = falcon.HTTP_500
             resp.body = {'error': str(e)}
         else:
-            resp.status = falcon.HTTP_200
+            resp.status = falcon.HTTP_201
             resp.body = ''
 
     def on_put(self, req, resp):
@@ -58,4 +59,4 @@ class LinkyardResource(object):
 
 app = falcon.API()
 linkyard = LinkyardResource()
-app.add_route('/lala', linkyard)
+app.add_route('/linkyard', linkyard)
