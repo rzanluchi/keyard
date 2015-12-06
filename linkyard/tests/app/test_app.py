@@ -5,6 +5,7 @@ import json
 import mock
 
 from linkyard import app
+from linkyard.app.utils import prepare_app
 
 
 class TestLinkyardResource(falcon.testing.TestBase):
@@ -13,6 +14,7 @@ class TestLinkyardResource(falcon.testing.TestBase):
         self.resource = app.LinkyardResource()
         self.resource.api = mock.MagicMock()
         self.api.add_route('/linkyard', self.resource)
+        prepare_app(self.api)
 
     def test_get(self):
         self.resource.api.get_service.return_value = ["localhost:8080"]
@@ -50,7 +52,7 @@ class TestLinkyardResource(falcon.testing.TestBase):
         self.resource.api.get_service.side_effect = AssertionError
         body = self.simulate_request('linkyard')
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500, body)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
         self.resource.api.get_service.assert_called_with(None, None, None)
 
     def test_post(self):
@@ -71,7 +73,7 @@ class TestLinkyardResource(falcon.testing.TestBase):
             'linkyard', method="POST",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
         self.resource.api.register.assert_called_with('web', '1.0', None)
 
     def test_put(self):
@@ -92,7 +94,7 @@ class TestLinkyardResource(falcon.testing.TestBase):
             'linkyard', method="PUT",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
         self.resource.api.health_check.assert_called_with('web', '1.0', None)
 
     def test_delete(self):
@@ -113,5 +115,5 @@ class TestLinkyardResource(falcon.testing.TestBase):
             'linkyard', method="DELETE",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
         self.resource.api.unregister.assert_called_with('web', '1.0', None)

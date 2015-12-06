@@ -4,6 +4,7 @@ import falcon.testing
 import json
 
 from linkyard import app
+from linkyard.app.utils import prepare_app
 
 
 class TestIntegrationLinkyardResource(falcon.testing.TestBase):
@@ -11,6 +12,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
     def before(self):
         self.resource = app.LinkyardResource()
         self.api.add_route('/linkyard', self.resource)
+        prepare_app(self.api)
 
     def tearDown(self):
         self.resource.api.store.store = {}
@@ -47,8 +49,8 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
         body = self.simulate_request('linkyard')
         parsed_body = json.loads(body[0])
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500, body)
-        self.assertTrue('error' in parsed_body, parsed_body)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
+        self.assertTrue('description' in parsed_body, parsed_body)
 
     def test_post(self):
         self.simulate_request(
@@ -66,8 +68,8 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
         parsed_body = json.loads(body[0])
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500)
-        self.assertTrue('error' in parsed_body, parsed_body)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
+        self.assertTrue('description' in parsed_body, parsed_body)
 
     def test_put(self):
         self.simulate_request(
@@ -85,8 +87,8 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
         parsed_body = json.loads(body[0])
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500)
-        self.assertTrue('error' in parsed_body, parsed_body)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
+        self.assertTrue('description' in parsed_body, parsed_body)
 
     def test_delete(self):
         self.resource.api.register('web', '1.0', 'localhost:8080')
@@ -104,5 +106,5 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
         parsed_body = json.loads(body[0])
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_500)
-        self.assertTrue('error' in parsed_body, parsed_body)
+        self.assertEqual(self.srmock.status, falcon.HTTP_400)
+        self.assertTrue('description' in parsed_body, parsed_body)
