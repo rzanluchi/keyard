@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/rzanluchi/linkyard.svg?branch=dev)](https://travis-ci.org/rzanluchi/linkyard)
 # Linkyard #
 
 This project is a implementation of a Service Registry to work with the service discovery system.
