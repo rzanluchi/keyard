@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from linkyard import store
+from keyard import store
 
 
 @pytest.mark.xfail

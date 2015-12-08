@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import mock
 
-from linkyard import api
+from keyard import api
 
 
 class TestAPI(object):

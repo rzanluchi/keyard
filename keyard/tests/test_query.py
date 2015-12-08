@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import mock
 
-from linkyard import store
-from linkyard.query import StoreQuery
+from keyard import store
+from keyard.query import StoreQuery
 
 
 class TestQueryStore(object):

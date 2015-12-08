@@ -3,13 +3,13 @@ import mock
 import falcon
 import falcon.testing
 
-from linkyard.app import utils
-from linkyard.app import errors
+from keyard.app import utils
+from keyard.app import errors
 
 
 class TestUtils(falcon.testing.TestBase):
 
-    @mock.patch('linkyard.app.utils._add_error_handlers')
+    @mock.patch('keyard.app.utils._add_error_handlers')
     def test_prepare_app(self, handler_mock):
         app = mock.MagicMock()
         utils.prepare_app(app)

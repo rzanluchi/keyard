@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import mock
 
-from linkyard import load_balancer
+from keyard import load_balancer
 
 
 class TestLoadBalancers(object):
 
-    @mock.patch('linkyard.load_balancer.random')
+    @mock.patch('keyard.load_balancer.random')
     def test_random_load_balancer(self, mock_random):
         mock_random.randint.return_value = 1
         values_list = ['localhost:27', 'localhost:7777']

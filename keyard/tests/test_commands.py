@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import mock
 
-from linkyard import store
-from linkyard.commands import StoreCommands
+from keyard import store
+from keyard.commands import StoreCommands
 
 
 class TestStoreCommands(object):
