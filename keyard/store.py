@@ -24,26 +24,22 @@ class EtcdStore(object):
 
     def get_key(self, service_name, version, location):
         key = self._build_path(service_name, version, location)
-        item = self.connection.get(key)
-        return item.value
+        items = self.connection.read(key, recursive=True)
+        return [item.value for item in items.children]
 
     def set_key(self, service_name, version, location, ttl=None):
         assert location
         if not version:
             version = '1.0'
         key = self._build_path(service_name, version, location)
-        return self.connection.set(key, location, ttl=ttl)
+        return bool(self.connection.set(key, location, ttl=ttl))
 
     def delete_key(self, service_name, version, location):
         "version and location cannot be None"
         assert version
         assert location
         key = self._build_path(service_name, version, location)
-        return self.connection.delete(key)
-
-    def get_services_keys(self, key):
-        nodes = self.connection.read(key, recursive=True)
-        return [self._extract_key(node.key) for node in nodes.children]
+        return bool(self.connection.delete(key))
 
     def _build_path(self, service_name, version, location):
         "Builds the query path for the value in the etcd"

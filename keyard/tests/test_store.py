@@ -17,31 +17,36 @@ class TestEtcdStore(object):
     def test_get_key_with_service_name(self):
         magic_mock = mock.MagicMock()
         magic_mock_node = mock.NonCallableMock(
-            **{'value': 'localhost:7088'})
-        magic_mock.get.return_value = magic_mock_node
+            **{'children': [type('Mock', (object,),
+                                 {'value': 'localhost:7088'})]})
+        magic_mock.read.return_value = magic_mock_node
         self.store.connection = magic_mock
-        assert self.store.get_key('registry', None, None) == 'localhost:7088'
-        self.store.connection.get.assert_called_with('/services/registry')
+        assert self.store.get_key('registry', None, None) == ['localhost:7088']
+        self.store.connection.read.assert_called_with('/services/registry',
+                                                      recursive=True)
 
     def test_get_key_with_version(self):
         magic_mock = mock.MagicMock()
         magic_mock_node = mock.NonCallableMock(
-            **{'value': 'localhost:7088'})
-        magic_mock.get.return_value = magic_mock_node
+            **{'children': [type('Mock', (object,),
+                                 {'value': 'localhost:7088'})]})
+        magic_mock.read.return_value = magic_mock_node
         self.store.connection = magic_mock
-        assert self.store.get_key('registry', '1.0', None) == 'localhost:7088'
-        self.store.connection.get.assert_called_with('/services/registry/1.0')
+        assert self.store.get_key('registry', '1.0', None) == ['localhost:7088']
+        self.store.connection.read.assert_called_with('/services/registry/1.0',
+                                                      recursive=True)
 
     def test_get_key_with_location(self):
         magic_mock = mock.MagicMock()
         magic_mock_node = mock.NonCallableMock(
-            **{'value': 'localhost:7088'})
-        magic_mock.get.return_value = magic_mock_node
+            **{'children': [type('Mock', (object,),
+                                 {'value': 'localhost:7088'})]})
+        magic_mock.read.return_value = magic_mock_node
         self.store.connection = magic_mock
         assert self.store.get_key('registry', '1.0', 'localhost:7088') \
-            == 'localhost:7088'
-        self.store.connection.get.assert_called_with(
-            '/services/registry/1.0/localhost:7088')
+            == ['localhost:7088']
+        self.store.connection.read.assert_called_with(
+            '/services/registry/1.0/localhost:7088', recursive=True)
 
     def test_set_key(self):
         magic_mock = mock.MagicMock()
