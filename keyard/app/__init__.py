@@ -2,11 +2,11 @@
 import falcon
 import json
 
-from linkyard import api
-from linkyard.app.utils import prepare_app
+from keyard import api
+from keyard.app.utils import prepare_app
 
 
-class LinkyardResource(object):
+class KeyardResource(object):
 
     def __init__(self):
         self.api = api.API()
@@ -48,6 +48,6 @@ class LinkyardResource(object):
         resp.body = ''
 
 app = falcon.API()
-linkyard = LinkyardResource()
-app.add_route('/linkyard', linkyard)
+keyard = KeyardResource()
+app.add_route('/keyard', keyard)
 prepare_app(app)

@@ -3,15 +3,15 @@ import falcon
 import falcon.testing
 import json
 
-from linkyard import app
-from linkyard.app.utils import prepare_app
+from keyard import app
+from keyard.app.utils import prepare_app
 
 
-class TestIntegrationLinkyardResource(falcon.testing.TestBase):
+class TestIntegrationKeyardResource(falcon.testing.TestBase):
 
     def before(self):
-        self.resource = app.LinkyardResource()
-        self.api.add_route('/linkyard', self.resource)
+        self.resource = app.KeyardResource()
+        self.api.add_route('/keyard', self.resource)
         prepare_app(self.api)
 
     def tearDown(self):
@@ -19,7 +19,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
 
     def test_get(self):
         self.resource.api.register('web', '1.0', 'localhost:8080')
-        body = self.simulate_request('linkyard',
+        body = self.simulate_request('keyard',
                                      query_string="service_name=web")
         parsed_body = json.loads(body[0])
 
@@ -29,7 +29,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
     def test_get_with_version(self):
         self.resource.api.register('web', '1.0', 'localhost:9090')
         body = self.simulate_request(
-            'linkyard', query_string="service_name=web&version=1.0")
+            'keyard', query_string="service_name=web&version=1.0")
         parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
@@ -38,7 +38,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
     def test_get_with_load_balancer(self):
         self.resource.api.register('web', '1.0', 'localhost:9090')
         body = self.simulate_request(
-            'linkyard',
+            'keyard',
             query_string="service_name=web&load_balancer_strategy=random")
         parsed_body = json.loads(body[0])
 
@@ -46,7 +46,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
         self.assertEqual(parsed_body.get('result'), 'localhost:9090')
 
     def test_bad_get(self):
-        body = self.simulate_request('linkyard')
+        body = self.simulate_request('keyard')
         parsed_body = json.loads(body[0])
 
         self.assertEqual(self.srmock.status, falcon.HTTP_400)
@@ -54,7 +54,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
 
     def test_post(self):
         self.simulate_request(
-            'linkyard', method="POST",
+            'keyard', method="POST",
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8888'}))
 
@@ -64,7 +64,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
 
     def test_bad_post(self):
         body = self.simulate_request(
-            'linkyard', method="POST",
+            'keyard', method="POST",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
         parsed_body = json.loads(body[0])
 
@@ -73,7 +73,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
 
     def test_put(self):
         self.simulate_request(
-            'linkyard', method="PUT",
+            'keyard', method="PUT",
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8888'}))
 
@@ -83,7 +83,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
 
     def test_bad_put(self):
         body = self.simulate_request(
-            'linkyard', method="PUT",
+            'keyard', method="PUT",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
         parsed_body = json.loads(body[0])
 
@@ -93,7 +93,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
     def test_delete(self):
         self.resource.api.register('web', '1.0', 'localhost:8080')
         self.simulate_request(
-            'linkyard', method="DELETE",
+            'keyard', method="DELETE",
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8080'}))
 
@@ -102,7 +102,7 @@ class TestIntegrationLinkyardResource(falcon.testing.TestBase):
 
     def test_bad_delete(self):
         body = self.simulate_request(
-            'linkyard', method="DELETE",
+            'keyard', method="DELETE",
             body=json.dumps({'service_name': 'web', 'version': '1.0'}))
         parsed_body = json.loads(body[0])
 

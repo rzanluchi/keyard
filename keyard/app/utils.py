@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from linkyard.app import errors
+from keyard.app import errors
 
 
 def prepare_app(app):

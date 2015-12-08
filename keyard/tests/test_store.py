@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 import mock
-from linkyard import store
+from keyard import store
 
 
 class TestEtcdStore(object):
 
-    @mock.patch('linkyard.store.EtcdStore._connect')
+    @mock.patch('keyard.store.EtcdStore._connect')
     def setup_class(self, mock):
         self.store = store.EtcdStore('127.0.0.1')
 
-    @mock.patch('linkyard.store.EtcdStore._connect')
+    @mock.patch('keyard.store.EtcdStore._connect')
     def test_connect_called(self, mock):
         local_store = store.EtcdStore('127.0.0.1')
         local_store._connect.assert_called_with('127.0.0.1')

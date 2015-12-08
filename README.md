@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/rzanluchi/linkyard.svg?branch=dev)](https://travis-ci.org/rzanluchi/linkyard)
-# Linkyard #
+[![Build Status](https://travis-ci.org/rzanluchi/keyard.svg?branch=dev)](https://travis-ci.org/rzanluchi/keyard)
+# Keyard #
 
 This project is a implementation of a Service Registry to work with the service discovery system.
 
