@@ -3,14 +3,14 @@ import falcon
 import falcon.testing
 import json
 
-from keyard import app
+from keyard.app import resource
 from keyard.app.utils import prepare_app
 
 
 class TestIntegrationKeyardResource(falcon.testing.TestBase):
 
     def before(self):
-        self.resource = app.KeyardResource()
+        self.resource = resource.KeyardResource()
         self.api.add_route('/keyard', self.resource)
         prepare_app(self.api)
 
@@ -58,7 +58,7 @@ class TestIntegrationKeyardResource(falcon.testing.TestBase):
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8888'}))
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_201)
+        self.assertEqual(self.srmock.status, falcon.HTTP_200)
         self.assertEqual(self.resource.api.get_service('web'),
                          ['localhost:8888'])
 
