@@ -19,3 +19,7 @@ class TestConfig(object):
         config = helpers.Config()
         config.config = {'section1': {'foo': 'bar'}}
         assert config.get_config('section1') == {'foo': 'bar'}
+
+    def test_defaults(self):
+        config = helpers.Config()
+        assert config.get_config('store_type') == 'simple'

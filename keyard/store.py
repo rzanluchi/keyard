@@ -14,9 +14,9 @@ class EtcdStore(object):
     Versions, if not provided, will be 1.0 by default when setting values
     """
 
-    def __init__(self, etcd_location="127.0.0.1", base_path="/services",
+    def __init__(self, host="127.0.0.1", base_path="/services",
                  **kwargs):
-        self._connect(etcd_location, **kwargs)
+        self._connect(host, **kwargs)
         self.base_path = base_path
 
     def _connect(self, etcd_location, **kwargs):
