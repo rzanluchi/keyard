@@ -4,14 +4,14 @@ import falcon.testing
 import json
 import mock
 
-from keyard import app
+from keyard.app import resource
 from keyard.app.utils import prepare_app
 
 
 class TestKeyardResource(falcon.testing.TestBase):
 
     def before(self):
-        self.resource = app.KeyardResource()
+        self.resource = resource.KeyardResource()
         self.resource.api = mock.MagicMock()
         self.api.add_route('/keyard', self.resource)
         prepare_app(self.api)
@@ -50,7 +50,7 @@ class TestKeyardResource(falcon.testing.TestBase):
     def test_bad_get(self):
         self.resource.api.get_service.return_value = "localhost:8080"
         self.resource.api.get_service.side_effect = AssertionError
-        body = self.simulate_request('keyard')
+        self.simulate_request('keyard')
 
         self.assertEqual(self.srmock.status, falcon.HTTP_400)
         self.resource.api.get_service.assert_called_with(None, None, None)
@@ -62,7 +62,7 @@ class TestKeyardResource(falcon.testing.TestBase):
             body=json.dumps({'service_name': 'web', 'version': '1.0',
                              'location': 'localhost:8888'}))
 
-        self.assertEqual(self.srmock.status, falcon.HTTP_201)
+        self.assertEqual(self.srmock.status, falcon.HTTP_200)
         self.resource.api.register.assert_called_with('web', '1.0',
                                                       'localhost:8888')
 

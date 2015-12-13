@@ -2,6 +2,7 @@
 import commands
 import load_balancer
 import query
+from keyard.helpers import config
 from store import store_factory
 
 
@@ -11,8 +12,9 @@ class API(object):
 
     This class will be a gateway for command/query methods
     """
-    def __init__(self, store_mode="simple", **kwargs):
-        self.store = store_factory(store_mode)(**kwargs)
+    def __init__(self):
+        store_type = config.get_config('store_type')
+        self.store = store_factory(store_type)(**config.get_config(store_type))
         self.commands = commands.StoreCommands(self.store)
         self.query = query.StoreQuery(self.store)
 
