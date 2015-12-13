@@ -1,4 +1,4 @@
-import ConfigParser
+import json
 
 
 class Config(object):
@@ -7,11 +7,11 @@ class Config(object):
     }
 
     def __init__(self):
-        self.config_parser = ConfigParser.ConfigParser()
         self.config = self.defaults
 
     def load_file(self, filename):
-        self.config = self.config_parser.read(filename)
+        with open(filename) as f:
+            self.config = json.loads(f.read())
 
     def get_config(self, section):
         return self.config.get(section, {})

@@ -1,0 +1,7 @@
+{
+    "store_type": "etcd",
+    "etcd": {
+        "host": "localhost",
+        "base_path": "/services"
+    }
+}
