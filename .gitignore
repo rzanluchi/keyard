@@ -4,4 +4,4 @@
 .cache
 build/
 dist/
-sample.egg-info/
+keyard.egg-info/
