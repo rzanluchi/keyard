@@ -6,12 +6,12 @@ This project is a implementation of a Service Registry to work with the service 
 
 # Getting started #
 
-Now there is no setup.py or pypi package, so if you want to use it just clone the repository and install the dependencies
+Aswe are not on pypi you need to clone this repo to use it
 
 ```
 git clone git@github.com:rzanluchi/keyard.git
 cd keyard
-pip install -r requirements.txt
+pip install .
 ```
 
 Probably you want to use a virtualenv

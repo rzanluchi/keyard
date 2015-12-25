@@ -2,3 +2,6 @@
 *.vagrant
 *.swp
 .cache
+build/
+dist/
+sample.egg-info/
