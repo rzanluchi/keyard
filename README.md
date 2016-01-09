@@ -78,6 +78,19 @@ It uses the same data as post.
 A delete will remove a location from keyard. Uses the same data as post
 
 
+# Example #
+
+There is a example app for you to check. Start an etcd application localhost and
+```
+gunicorn example.keyard_app:app -b 0.0.0.0:8000
+gunicorn example.app2:app -b 0.0.0.0:8002
+gunicorn example.app1:app -b 0.0.0.0:8001
+
+curl 0.0.0.0:8001/app1
+```
+
+That curl should return you "Hello World"
+
 
 # License #
 
