@@ -16,4 +16,4 @@ requests.post('http://localhost:8000/keyard', data=json.dumps({
     'service_name': 'app2',
     'version': '1.0',
     'location': 'localhost:8002'
-}))
+}), headers={'content-type': 'application/json'})
