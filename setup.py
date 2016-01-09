@@ -23,14 +23,14 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1',
+    version='0.1.1',
 
     description='Simple Service Registry',
     long_description=long_description,
 
     # The project's main homepage.
     url='https://github.com/rzanluchi/keyard',
-    download_url="https://github.com/rzanluchi/keyard/tarball/0.1",
+    download_url="https://github.com/rzanluchi/keyard/tarball/0.1.1",
 
     # Author details
     author='Raphael Bernardi Zanluchi',
