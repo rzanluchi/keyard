@@ -17,7 +17,7 @@ class KeyardResource(object):
         result = self.api.get_service(service_name, version,
                                       load_balancer_strategy)
         resp.status = falcon.HTTP_200
-        resp.data = json.dumps({'result': result})
+        resp.body = json.dumps({'result': result})
 
     def on_post(self, req, resp):
         data = json.loads(req.stream.read())

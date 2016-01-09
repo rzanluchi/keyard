@@ -20,6 +20,8 @@ class TestUtils(falcon.testing.TestBase):
         utils._add_error_handlers(app)
         calls = [mock.call.add_error_handler(Exception,
                                              errors.handle_default_errors),
+                 mock.call.add_error_handler(falcon.HTTPError,
+                                             errors.handle_falcon_errors),
                  mock.call.add_error_handler(AssertionError,
                                              errors.handle_assertion_errors)]
         app.assert_has_calls(calls)
